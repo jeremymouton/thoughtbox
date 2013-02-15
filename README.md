@@ -1,3 +1,5 @@
+**Demo:** [https://dl.dropbox.com/u/2848831/thoughtbox/index.html](https://dl.dropbox.com/u/2848831/thoughtbox/index.html)
+
 ## Wat? 
 
 Thoughbox is most likely a badly written attempt at creating a markdown post system running out of a Dropbox public folder. I don't have a blog or a way to keep track of my newly found code tricks, I love markdown and want to write with it even when I have nothing to say, and finally, it's Valentine's day night, and I need a creative outlet.
