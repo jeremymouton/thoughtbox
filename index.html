@@ -1,0 +1,136 @@
+<html>
+<head>
+	<title>Thoughtbox</title>
+	<script type="text/javascript">
+		var path = 'https://dl.dropbox.com/u/2848831/thoughtbox/';
+	</script>
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.2.2/css/bootstrap.css">
+	<style type="text/css">
+		
+		body { 
+			padding: 20px; 
+		}
+
+		a:hover { 
+			text-decoration: none;
+		}
+
+		h2 {
+			color: #40aedf;
+			font-size: 22px;
+			line-height: 110%;
+			margin-bottom: 6px;
+		}
+		
+		.header { 
+			margin-bottom: 50px; 
+			text-align:center; 
+		}
+		
+		.main { 
+			margin: 0 auto; 
+		}
+		
+		.article { 
+			margin-bottom: 20px; 
+			width: 335px;
+			padding: 5px 20px;
+			background: #fdfdfd;
+			border: 1px solid #fafafa;
+			font-size: 12px;
+			color: #21272f;
+		}
+
+		.article:hover {
+			border: 1px solid #eee;
+			background: #f8f8f8;
+		}
+	
+		.article img { width: 100% !important; }
+
+		/* article styles */
+		
+		code {
+			color: #0088cc;
+		}
+
+	</style>
+
+</head>
+<body>
+	<div class="main container-fluid">
+		<div class="row-fluid">
+			<div class="span12">
+				<div class="header">
+					<h1>Thoughtbox</h1>
+				</div>
+
+				<div class="posts"></div>
+			</div>
+		</div>
+	</div>
+
+	<!-- JS served from cloudflare's CDN -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/pagedown/1.0/Markdown.Converter.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/masonry/2.1.07/jquery.masonry.min.js"></script>
+
+	<script type="text/javascript">
+
+		// RELEASE THE BEAST
+		// Init vars
+
+		var	converter = new Markdown.Converter();
+		var db_url    = path + 'db.md';
+			post_urls = [];
+		
+		// Get the DB file and show the post contents
+		
+		db = $.ajax({	
+			url: db_url,
+			success: function(data) {
+				// Split each line to get each URL and everse the array to get the latest file. This is approximate, first loaded first served.
+				post_urls = db.responseText.split("\n").reverse();
+			}
+		}).done( function() {
+		
+			// Get the contents of each URL returned by the database
+
+			$.each(post_urls, function(i, url) {
+				var posts = '';
+				$('.posts').delay(100).queue( function(next) {
+					posts = $.ajax({
+						url: url,
+						type: "GET",
+						success: function(data) {
+							// Get the post's contents
+							post_content = posts.responseText;	
+							// Publish results
+							$('div.posts').append('<div class="article post-' + i + '">' + converter.makeHtml(post_content) + '</div>').masonry( 'reload' );
+
+							// Wrap the title to the markdown file
+							$('.post-' + i + ' h2').wrap('<a class="postlink" href="' + url + '">');
+						},
+						error: function() {
+							$('div.posts').append('<div class="article-' + i + ' error"><h2>Oh no...</h2><p>This post couldn\'t be loaded. Maybe it has been removed.</p></div>').masonry( 'reload' );
+						}
+					});
+
+					next();
+				});
+			});
+		});
+
+		// Start Masonery
+		var $container = $('.posts');
+		$container.imagesLoaded( function() {
+			$container.masonry({
+				itemSelector: '.article',
+				columnWidth: 30
+			});
+		});
+
+	</script>
+
+</body>
+</html>
